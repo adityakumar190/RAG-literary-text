@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Extraction of Indian Cultural Elements Using RAG</title>
+<meta name="description" content="Extraction of Indian flora and fauna from Indian literary texts using Retrieval-Augmented Generation (RAG).">
+<style>
+:root{--ink:#1f2a5c;--ink2:#2f3d82;--teal:#0e6b72;--text:#1f2330;--muted:#596075;--rule:#d3d8e8;--band:#eef1f8;--paper:#fcfcfe}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:1.5rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--text);font-family:Georgia,"Times New Roman",serif;font-size:1.14rem;line-height:1.75}
+a{color:var(--teal);text-underline-offset:3px}
+a:focus-visible{outline:3px solid #e0a800;outline-offset:3px;border-radius:2px}
+.hero{background:linear-gradient(135deg,#18214b 0%,var(--ink2) 100%);color:#fff;padding:0 1.25rem 3rem;border-top:10px solid var(--teal)}
+.hero .in{max-width:70rem;margin:0 auto;padding-top:2.6rem}
+.hero .kind{font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:1rem;color:#bfc9ee;margin:0 0 1rem;letter-spacing:.02em}
+.hero h1{font-weight:600;font-size:clamp(2rem,5vw,3.3rem);line-height:1.15;margin:0;max-width:20em;padding-top:1.1rem;border-top:4px solid #fff}
+.hero .sub{font-size:1.3rem;color:#d6ddf7;margin:.9rem 0 1.8rem;font-style:italic}
+.hero dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1rem 2rem;margin:0 0 1.8rem;max-width:52rem;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif}
+.hero dt{font-size:.88rem;color:#aab6e6}
+.hero dd{margin:.1rem 0 0;font-size:1.05rem}
+.btns{display:flex;flex-wrap:wrap;gap:.8rem;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif}
+.btns a{color:#fff;border:1.5px solid #8f9fe0;padding:.55rem 1.1rem;border-radius:6px;text-decoration:none;font-weight:600}
+.btns a:first-child{background:#fff;color:var(--ink);border-color:#fff}
+.btns a:hover{background:#e6ebff;color:var(--ink)}
+.page{max-width:70rem;margin:0 auto;padding:2.5rem 1.25rem 3rem;display:grid;grid-template-columns:13.5rem minmax(0,1fr);gap:3.5rem}
+.toc{position:sticky;top:1.5rem;align-self:start;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:.97rem}
+.toc p{margin:0 0 .6rem;font-weight:600;color:var(--ink)}
+.toc ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--rule)}
+.toc a{display:block;padding:.28rem 0 .28rem .9rem;margin-left:-2px;border-left:2px solid transparent;color:var(--muted);text-decoration:none}
+.toc a:hover{color:var(--ink);text-decoration:none}
+article{max-width:46rem}
+section{margin-bottom:3rem}
+h2{font-size:1.7rem;font-weight:600;color:var(--ink);line-height:1.25;margin:0 0 1rem;padding-top:.8rem;border-top:3px solid var(--ink)}
+h2 span{color:var(--teal);margin-right:.5rem}
+h3{font-size:1.2rem;color:var(--ink);margin:1.8rem 0 .4rem}
+p{margin:.8rem 0;text-align:justify;hyphens:auto}
+.abs{background:var(--band);border-left:5px solid var(--teal);padding:1.2rem 1.5rem;border-radius:0 8px 8px 0}
+.abs h2{border:0;padding:0;font-size:1.3rem;margin-bottom:.3rem}
+ol.n,ul.b{padding-left:1.5rem}
+li{margin:.45rem 0}
+.tw{overflow-x:auto;margin:1.2rem 0;border:1px solid var(--rule);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:.98rem;line-height:1.5}
+caption{caption-side:top;text-align:left;padding:.7rem .9rem;font-style:italic;font-family:Georgia,"Times New Roman",serif;color:var(--muted);font-size:1rem}
+th,td{padding:.65rem .9rem;text-align:left;vertical-align:top;border-top:1px solid var(--rule)}
+th{background:var(--band);color:var(--ink);font-weight:600}
+.chips{list-style:none;display:flex;flex-wrap:wrap;gap:.45rem;padding:0;margin:1rem 0}
+.chips li{margin:0;padding:.18rem .75rem;border:1px solid var(--rule);background:#fff;border-radius:999px;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:.95rem}
+.key{font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:.92rem;color:var(--muted)}
+code{font-family:Consolas,"Courier New",monospace;font-size:.92em;background:var(--band);padding:.1rem .35rem;border-radius:4px}
+footer{background:var(--ink);color:#c5cdf0;text-align:center;padding:1.6rem 1.25rem;font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:.95rem}
+@media (max-width:62rem){.page{grid-template-columns:1fr;gap:1.5rem}.toc{position:static}.toc ol{display:flex;flex-wrap:wrap;gap:0 1.2rem;border:0}.toc a{border:0;padding:.2rem 0;margin:0}}
+@media print{.toc,.btns{display:none}.hero{background:#fff;color:#000;border-top:4px solid #000}.hero h1{border-color:#000}.hero .sub,.hero dt,.hero .kind{color:#333}.page{display:block}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="in">
+  <p class="kind">Digital Humanities Lab</p>
+  <h1>Extraction of Indian Cultural Elements Using RAG</h1>
+  <p class="sub">Indian Flora and Fauna in Literary Texts</p>
+  <dl>
+    <div><dt>Author Name(s)</dt><dd>Aditya Kumar</dd></div>
+    <div><dt>Affiliation</dt><dd>Department of Humanities and Social Sciences <br>Indian Institute of Technology (Indian School of Mines), Dhanbad</dd></div>
+    <div><dt>Semester</dt><dd>Monsoon Semester 2026</dd></div>
+  </dl>
+  <div class="btns">
+    <a href="https://github.com/adityakumar190/RAG-literary-text/blob/main/flora_fauna.py" target="_blank" rel="noopener noreferrer">View Python extraction file</a>
+  </div>
+</div></header>
+
+<div class="page">
+<nav class="toc" aria-label="Contents"><p>Contents</p><ol>
+ <li><a href="#abstract">Abstract</a></li>
+ <li><a href="#introduction">1. Introduction</a></li>
+ <li><a href="#objectives">2. Objectives</a></li>
+ <li><a href="#texts">3. Literary texts</a></li>
+ <li><a href="#method">4. Method</a></li>
+ <li><a href="#files">5. Project files</a></li>
+ <li><a href="#extraction">6. Extraction categories</a></li>
+ <li><a href="#observations">7. Observations</a></li>
+ <li><a href="#limitations">8. Limitations</a></li>
+ <li><a href="#conclusion">9. Conclusion</a></li>
+ <li><a href="#references">References</a></li>
+ </ol></nav>
+
+<article>
+<section id="abstract" class="abs"><h2>Abstract</h2>
+<p>This project explores the extraction of Indian cultural elements, with particular attention to flora and fauna, from Indian literary texts. A repository of literary texts is used as the source collection, and a Retrieval-Augmented Generation (RAG) workflow supports the identification of relevant passages and the extraction of plant and animal names. The extracted results are organised in a Python file named <code>flora_fauna.py</code>, with separate collections for flora and fauna. The Python file is published in a GitHub repository and linked from this project webpage.</p></section>
+
+<section id="introduction"><h2><span>1</span>Introduction</h2>
+<p>Indian literary texts contain references to plants, trees, flowers, crops, animals, birds, reptiles, fish and insects. Such references can communicate information about the natural environment as well as cultural practices, symbolism, everyday life and regional knowledge.</p>
+<p>This project uses Retrieval-Augmented Generation (RAG) to work with a collection of Indian literary texts and identify references to flora and fauna. The extracted terms are organised systematically so that the results can be inspected, reused and extended.</p></section>
+
+<section id="objectives"><h2><span>2</span>Objectives</h2>
+<ol class="n">
+<li>To create a repository of Indian literary texts selected for the assignment.</li>
+<li>To follow the RAG pipeline demonstrated in class to retrieve relevant information from the texts.</li>
+<li>To identify and extract names of Indian flora and fauna found in the literary sources.</li>
+<li>To organise the extracted results in the prescribed Python file, <code>flora_fauna.py</code>.</li>
+<li>To publish the Python file in a GitHub repository and provide a working link to it on this webpage.</li>
+</ol></section>
+
+<section id="texts"><h2><span>3</span>Literary texts</h2>
+<p>The project uses six Indian literary texts as its source collection.</p>
+<div class="tw"><table><caption>Table 1. Literary sources used for extraction</caption>
+<thead><tr><th>No.</th><th>Title of literary text</th><th>Author / Release date</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Ancient Ballads and Legends of Hindustan</td><td>Toru Dutt / October 29, 2007</td></tr>
+<tr><td>2</td><td>Glimpses of Bengal</td><td>Rabindranath Tagore / April 1, 2005</td></tr>
+<tr><td>3</td><td>Tales of Ind, and Other Poems</td><td>T. Ramakrishna Pillai / February 1, 2004</td></tr>
+<tr><td>4</td><td>The Golden Threshold</td><td>Sarojini Naidu / October 1, 1996</td></tr>
+<tr><td>5</td><td>The Poison Tree</td><td>Bankimacandra Cattopadhyaya / January 4, 2006</td></tr>
+<tr><td>6</td><td>Sakoontala</td><td>Kālidāsa / April 1, 2004</td></tr>
+</tbody></table></div></section>
+
+<section id="method"><h2><span>4</span>Method</h2>
+<p>The work follows the RAG-based process demonstrated in class. The main stages are:</p>
+<ol class="n">
+<li><strong>Text repository:</strong> Collect and organise the six Indian literary texts in a digital repository.</li>
+<li><strong>Preparation:</strong> Prepare the text data for processing, including splitting it into suitable passages or chunks.</li>
+<li><strong>Retrieval:</strong> Retrieve passages relevant to queries about plants, trees, flowers, crops, animals, birds and other fauna.</li>
+<li><strong>Extraction:</strong> Examine the retrieved passages and record the flora and fauna terms supported by the texts.</li>
+<li><strong>Organisation:</strong> Arrange the extracted terms in the required Python lists, <code>flora_RAG_extraction</code> and <code>fauna_RAG_extraction</code>, in <code>flora_fauna.py</code>.</li>
+<li><strong>Publication:</strong> Upload the Python file to GitHub and link to it from this webpage.</li>
+</ol>
+<p class="key">Note: Describe the exact embedding model, vector database, chunk size, retrieval settings and language model used in your class workflow, if your instructor expects those technical details.</p></section>
+
+<section id="files"><h2><span>5</span>Project files</h2>
+<p>The main output file is the Python file containing the extracted flora and fauna. Update the GitHub link below after uploading your file.</p>
+<div class="tw"><table><caption>Table 2. Project files</caption>
+<thead><tr><th>File</th><th>Content</th><th>Link</th></tr></thead>
+<tbody>
+<tr><td><code>flora_fauna.py</code></td><td>Extracted flora and fauna lists</td><td><a href="https://github.com/adityakumar190/RAG-literary-text/blob/main/flora_fauna.py" target="_blank" rel="noopener noreferrer">View Python file</a></td></tr>
+<tr><td><code>index.html</code></td><td>Project webpage</td><td>This page</td></tr>
+</tbody></table></div></section>
+
+<section id="extraction"><h2><span>6</span>Extraction categories</h2>
+<p>The extracted results are organised into two main collections, following the variable names specified in the assignment.</p>
+<h3>Flora</h3>
+<ul class="chips">
+<li>Trees</li><li>Plants</li><li>Flowers</li><li>Herbs</li><li>Crops</li>
+</ul>
+<h3>Fauna</h3>
+<ul class="chips">
+<li>Mammals</li><li>Birds</li><li>Reptiles</li><li>Fish</li><li>Insects</li>
+</ul>
+<p>The names identified in the literary texts are recorded in <code>flora_RAG_extraction</code> and <code>fauna_RAG_extraction</code> in the linked Python file. The lists should contain the actual extracted names rather than only these broad category labels. Where useful, retain a text-wise record in the Python file or in accompanying notes to show which source text supports each term.</p></section>
+
+<section id="observations"><h2><span>7</span>Observations</h2>
+<p>The extracted references can be examined to identify recurring plants and animals, distinctive references associated with individual texts, and the ways in which the natural world appears in literary descriptions. A comparison across the six texts may also show differences in setting, imagery and cultural context.</p>
+<ul class="b">
+<li><strong>Recurring references:</strong> Note flora or fauna terms that occur in more than one text.</li>
+<li><strong>Text-specific references:</strong> Identify terms that appear in only one source text.</li>
+<li><strong>Cultural significance:</strong> Where supported by the passage, discuss symbolic, religious, agricultural or everyday associations.</li>
+<li><strong>Source traceability:</strong> Keep track of the text and passage from which each extracted term was identified.</li>
+</ul>
+<p>Complete this section with observations based on your actual extracted dataset; do not treat these prompts as findings unless your results support them.</p></section>
+
+<section id="limitations"><h2><span>8</span>Limitations</h2>
+<ul class="b">
+<li>Some references may be ambiguous, metaphorical or used as proper names rather than literal references to flora or fauna.</li>
+<li>Older literary texts may use historical, regional or variant spellings for plant and animal names.</li>
+<li>Some terms may refer to broad groups rather than identifiable species.</li>
+<li>Automated retrieval and generation may miss relevant references or suggest terms that require verification against the original passage.</li>
+<li>Each extracted item should therefore be checked against its source text before it is included in the final dataset.</li>
+</ul></section>
+
+<section id="conclusion"><h2><span>9</span>Conclusion</h2>
+<p>This project applies a RAG workflow to the study of Indian literary texts and the extraction of flora and fauna references. The results are organised in the prescribed Python file, <code>flora_fauna.py</code>, and made accessible through a GitHub repository and this webpage. The resulting collection provides a structured starting point for examining representations of the natural world in Indian literary writing.</p></section>
+
+<section id="references"><h2>References</h2>
+<ul class="b">
+<li>Project Gutenberg</li>
+<li><a href="https://docs.github.com/en/pages" target="_blank" rel="noopener noreferrer">GitHub Pages Documentation</a>: Website publishing and hosting.</li>
+</ul></section>
+</article></div>
+
+<footer>Monsoon Semester 2026 &middot; Department of HSS, IIT (ISM) Dhanbad</footer>
+</body>
+</html>
