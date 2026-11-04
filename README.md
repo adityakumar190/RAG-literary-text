@@ -8,7 +8,7 @@ Extraction of Indian flora and fauna from Indian literary texts using Retrieval-
 
 **Affiliation:** Department of Humanities and Social Sciences, Indian Institute of Technology (Indian School of Mines), Dhanbad
 
-**Project webpage:** https://adityakumar190.github.io/indian-flora-fauna-rag/
+**Project webpage:** https://adityakumar190.github.io/RAG-literary-text/
 
 ## Research question
 
