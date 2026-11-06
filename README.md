@@ -1,4 +1,4 @@
-# Extraction of Indian Cultural Elements Using RAG
+# Extraction of Indian Cultural Elements Using RAG: Flora and Fauna
 
 Extraction of Indian flora and fauna from Indian literary texts using Retrieval-Augmented Generation (RAG). For each of six books from Project Gutenberg, one list of flora and one list of fauna was extracted and stored as Python lists. The lists were then examined for their size, for elements that recur across books and for the kinds of error they contain.
 
