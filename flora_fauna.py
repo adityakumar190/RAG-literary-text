@@ -1,5 +1,5 @@
 """
-Topic: Extraction of Indian Cultural Elements Using RAG
+Topic: Extraction of Indian Cultural Elements Using RAG: Flora and Fauna
 Author Name: Aditya Kumar
 
 Short Description:
